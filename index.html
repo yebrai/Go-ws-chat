@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple WebSocket Chat</title>
+</head>
+<body>
+<h1>Simple WebSocket Chat</h1>
+<input id="name" type="text" placeholder="Your name...">
+<input id="message" type="text" placeholder="Type a message...">
+<button onclick="sendMessage()">Send</button>
+<div id="output"></div>
+
+<script>
+    const ws = new WebSocket("ws://localhost:3000/ws"); // Establish a WebSocket connection
+
+    ws.onopen = () => console.log("WebSocket connection opened."); // Log when connection is established
+
+    ws.onmessage = function(event) {
+        const output = document.getElementById("output"); // Get the output div
+        const data = JSON.parse(event.data); // Parse the incoming message as JSON
+        output.innerHTML += `<p><strong>${data.name}:</strong> ${data.message}</p>`; // Display the message
+    };
+
+    ws.onclose = () => console.log("WebSocket connection closed."); // Log when connection is closed
+
+    function sendMessage() {
+        const name = document.getElementById("name").value; // Get the user's name
+        const message = document.getElementById("message").value; // Get the message content
+        if (ws.readyState === WebSocket.OPEN) {
+            // Check if the WebSocket connection is open
+            ws.send(JSON.stringify({ name: name, message: message })); // Send the message to the server
+        } else {
+            console.error("WebSocket connection is not open."); // Log if connection is not open
+        }
+    }
+</script>
+</body>
+</html>
